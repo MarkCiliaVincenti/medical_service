@@ -1,0 +1,6 @@
+.vscode
+
+Debug
+bin
+
+project.nuget.cache
