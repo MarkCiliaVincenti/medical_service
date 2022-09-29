@@ -1,6 +1,9 @@
+# Visual Studio Code
 .vscode
 
-Debug
-bin
-
-project.nuget.cache
+# Build results
+[Dd]ebug/
+[Rr]elease/
+build/
+[Bb]in/
+[Oo]bj/
