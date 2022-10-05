@@ -9,9 +9,20 @@ public class UserService
         _repository = repository;
     }
 
-    public bool UserExists(string login, string password)
-    {        
-        return _repository.UserExists(login, password);
+    public Result UserExists(string login, string password)
+    {     
+        if (string.IsNullOrEmpty(login))
+            return Result.Err("Login not specified");
+
+        if (string.IsNullOrEmpty(password))
+            return Result.Err("Password not specified");
+
+        bool exists = _repository.UserExists(login, password);
+
+        if (exists)
+            return Result.Ok();
+
+        return Result.Err("User not found");
     }
 
     public Result<User> GetUserByLogin(string login)
@@ -27,23 +38,30 @@ public class UserService
         return Result.Ok<User>(result);
     }
 
-    public Result CreateUser(string login, string password)
+    public Result<User> CreateUser(string login, string password)
     {
         if (string.IsNullOrEmpty(login))
-            return Result.Err("Login not specified");
+            return Result.Err<User>("Login not specified");
 
         if (string.IsNullOrEmpty(password))
-            return Result.Err("Password not specified");
+            return Result.Err<User>("Password not specified");
 
         if (_repository.GetUserByLogin(login) is not null)
-            return Result.Err("User with this login already exists");
+            return Result.Err<User>("User with this login already exists");
 
 
+        var user = new User(
+            id: default,
+            phone: string.Empty,
+            name: string.Empty,
+            login: login,
+            password: password
+        );
         bool isCreate = _repository.CreateUser(login, password);
 
         if (isCreate)
-            return Result.Ok();
+            return Result.Ok<User>(user);
 
-        return Result.Err("Failed to create user");
+        return Result.Err<User>("Failed to create user");
     }
 }
