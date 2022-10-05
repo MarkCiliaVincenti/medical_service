@@ -25,7 +25,6 @@ public class UserServiceTests
         //Assert
         Assert.True(result.IsFail);
         Assert.Equal(expected_error, result.Error);
-        Assert.Equal(null, result.Value);
     }
 
     [Fact]
@@ -44,7 +43,6 @@ public class UserServiceTests
         //Assert
         Assert.True(result.IsFail);
         Assert.Equal(expected_error, result.Error);
-        Assert.Equal(null, result.Value);
     }
 
     [Fact]
@@ -81,7 +79,6 @@ public class UserServiceTests
         //Assert
         Assert.True(result.IsFail);
         Assert.Equal(expected, actual);
-        Assert.Equal(null, result.Value);
     }
 
     [Fact]
@@ -99,7 +96,6 @@ public class UserServiceTests
         //Assert
         Assert.True(result.IsFail);
         Assert.Equal(expected, actual);
-        Assert.Equal(null, result.Value);
     }
 
     [Fact]
@@ -120,11 +116,10 @@ public class UserServiceTests
         //Assert
         Assert.True(result.IsFail);
         Assert.Equal(expected, actual);
-        Assert.Equal(null, result.Value);
     }
 
     [Fact]
-    public void CreateUserWhenRepositoryWork_ShouldOk()
+    public void CreateUserSuccess_ShouldOk()
     {
         //Arrange
 
@@ -146,7 +141,7 @@ public class UserServiceTests
     }
 
     [Fact]
-    public void CreateUserWhenRepositoryBroken_ShouldFail()
+    public void CreateUserOtherError_ShouldFail()
     {
         //Arrange
 
@@ -163,7 +158,6 @@ public class UserServiceTests
         //Assert
         Assert.True(result.IsFail);
         Assert.Equal(expected_error, result.Error);
-        Assert.Equal(null, result.Value);
     }
 
     [Fact]
