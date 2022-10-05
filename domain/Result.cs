@@ -1,6 +1,6 @@
 namespace Domain;
 
-class Result
+public class Result
 {
     public bool Success { get; }
     public bool IsFail { get => !Success; }
@@ -35,7 +35,7 @@ class Result
     }
 }
 
-class Result<T> : Result
+public class Result<T> : Result
 {
     public T Value { get; }
 

@@ -1,6 +1,6 @@
 namespace Domain;
 
-interface IUserRepository
+public interface IUserRepository
 {
     bool UserExists(string login, string password);
     User? GetUserByLogin(string login);
