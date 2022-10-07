@@ -2,7 +2,7 @@ namespace Domain;
 
 public interface IUserRepository
 {
-    bool UserExists(string login, string password);
+    bool UserExists(string login);
     User? GetUserByLogin(string login);
-    bool CreateUser(string login, string password);
+    User? CreateUser(UserForm form);
 }

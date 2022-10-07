@@ -68,12 +68,21 @@ public class UserServiceTests
     public void CreateUserWithEmptyLogin_ShouldFail()
     {
         //Arrange
+        string phoneNumber = "8-800-555-35-34";
+        string fullName = "F.S. Anvr";
         string login = string.Empty;
-        string password = string.Empty;
+        string password = "super strong password";
+        var form = new UserForm(
+            phoneNumber,
+            fullName,
+            login,
+            password
+        );
+
         string expected = "Login not specified";
 
         //Act
-        var result = _userService.CreateUser(login, password);
+        var result = _userService.CreateUser(form);
         var actual = result.Error;
 
         //Assert
@@ -85,12 +94,20 @@ public class UserServiceTests
     public void CreateUserWithEmptyPassword_ShouldFail()
     {
         //Arrange
+        string phoneNumber = "8-800-555-35-34";
+        string fullName = "F.S. Anvr";
         string login = "fs-anvr";
         string password = string.Empty;
+        var form = new UserForm(
+            phoneNumber,
+            fullName,
+            login,
+            password
+        );
         string expected = "Password not specified";
 
         //Act
-        var result = _userService.CreateUser(login, password);
+        var result = _userService.CreateUser(form);
         var actual = result.Error;
 
         //Assert
@@ -103,14 +120,22 @@ public class UserServiceTests
     {
         //Arrange
         _userRepositoryMock.Setup(repository => repository.GetUserByLogin(It.IsAny<string>()))
-            .Returns(() => new User(5, "", "", "", ""));
+            .Returns(() => new User(0, "", "", "", ""));
 
+        string phoneNumber = "8-800-555-35-34";
+        string fullName = "F.S. Anvr";
         string login = "fs-anvr";
-        string password = "difficult password";
+        string password = "super strong password";
+        var form = new UserForm(
+            phoneNumber,
+            fullName,
+            login,
+            password
+        );
         string expected = "User with this login already exists";
 
         //Act
-        var result = _userService.CreateUser(login, password);
+        var result = _userService.CreateUser(form);
         var actual = result.Error;
 
         //Assert
@@ -123,15 +148,25 @@ public class UserServiceTests
     {
         //Arrange
 
+        string phoneNumber = "8-800-555-35-34";
+        string fullName = "F.S. Anvr";
         string login = "fs-anvr";
-        string password = "difficult password";
+        string password = "super strong password";
+        var form = new UserForm(
+            phoneNumber,
+            fullName,
+            login,
+            password
+        );
         string expected_error = string.Empty;
 
-        _userRepositoryMock.Setup(repository => repository.CreateUser(It.IsAny<string>(), It.IsAny<string>()))
-            .Returns(() => true);
+        _userRepositoryMock.Setup(repository => repository.GetUserByLogin(It.IsAny<string>()))
+            .Returns(() => null);
+        _userRepositoryMock.Setup(repository => repository.CreateUser(It.IsAny<UserForm>()))
+            .Returns(() => new User(5, phoneNumber, fullName, login, password));
 
         //Act
-        var result = _userService.CreateUser(login, password);
+        var result = _userService.CreateUser(form);
 
         //Assert
         Assert.True(result.Success);
@@ -145,15 +180,25 @@ public class UserServiceTests
     {
         //Arrange
 
+        string phoneNumber = "8-800-555-35-34";
+        string fullName = "F.S. Anvr";
         string login = "fs-anvr";
-        string password = "difficult password";
+        string password = "super strong password";
+        var form = new UserForm(
+            phoneNumber,
+            fullName,
+            login,
+            password
+        );
         string expected_error = "Failed to create user";
 
-        _userRepositoryMock.Setup(repository => repository.CreateUser(It.IsAny<string>(), It.IsAny<string>()))
-            .Returns(() => false);
+        _userRepositoryMock.Setup(repository => repository.GetUserByLogin(It.IsAny<string>()))
+            .Returns(() => null);
+        _userRepositoryMock.Setup(repository => repository.CreateUser(It.IsAny<UserForm>()))
+            .Returns(() => null);
 
         //Act
-        var result = _userService.CreateUser(login, password);
+        var result = _userService.CreateUser(form);
 
         //Assert
         Assert.True(result.IsFail);
@@ -166,28 +211,10 @@ public class UserServiceTests
         //Arrange
 
         string login = string.Empty;
-        string password = "difficult password";
         string expected_error = "Login not specified";
 
         //Act
-        var result = _userService.UserExists(login, password);
-
-        //Assert
-        Assert.True(result.IsFail);
-        Assert.Equal(expected_error, result.Error);
-    }
-
-    [Fact]
-    public void UserExistsWithEmptyPassword_ShouldFail()
-    {
-        //Arrange
-
-        string login = "fsanvr";
-        string password = string.Empty;
-        string expected_error = "Password not specified";
-
-        //Act
-        var result = _userService.UserExists(login, password);
+        var result = _userService.UserExists(login);
 
         //Assert
         Assert.True(result.IsFail);
@@ -200,14 +227,13 @@ public class UserServiceTests
         //Arrange
 
         string login = "fsanvr";
-        string password = "difficult password";
         string expected_error = string.Empty;
 
-        _userRepositoryMock.Setup(repository => repository.UserExists(It.IsAny<string>(), It.IsAny<string>()))
+        _userRepositoryMock.Setup(repository => repository.UserExists(It.IsAny<string>()))
             .Returns(() => true);
 
         //Act
-        var result = _userService.UserExists(login, password);
+        var result = _userService.UserExists(login);
 
         //Assert
         Assert.True(result.Success);
@@ -220,14 +246,13 @@ public class UserServiceTests
         //Arrange
 
         string login = "fsanvr";
-        string password = "difficult password";
         string expected_error = "User not found";
 
-        _userRepositoryMock.Setup(repository => repository.UserExists(It.IsAny<string>(), It.IsAny<string>()))
+        _userRepositoryMock.Setup(repository => repository.UserExists(It.IsAny<string>()))
             .Returns(() => false);
 
         //Act
-        var result = _userService.UserExists(login, password);
+        var result = _userService.UserExists(login);
 
         //Assert
         Assert.True(result.IsFail);
