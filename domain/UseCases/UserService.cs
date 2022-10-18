@@ -29,10 +29,10 @@ public class UserService
 
         User? result = _repository.GetUserByLogin(login);
 
-        if (result is null)
-            return Result.Err<User>("User not found");
+        if (result is not  null)
+            return Result.Ok<User>(result);
 
-        return Result.Ok<User>(result);
+        return Result.Err<User>("User not found");
     }
 
     public Result<User> CreateUser(UserForm form)
