@@ -6,11 +6,11 @@ public class ScheduleForm
     public DateOnly Date { get; set; }
     public TimeOnly DayStart { get; set; }
     public TimeOnly DayEnd { get; set; }
-    ScheduleForm(int doctorID, DateOnly date, TimeOnly dayStart, TimeOnly datEnd)
+    public ScheduleForm(int doctorID, DateOnly date, TimeOnly dayStart, TimeOnly dayEnd)
     {
         DoctorID = doctorID;
         Date = date;
         DayStart = dayStart;
-        DayEnd = DayEnd;
+        DayEnd = dayEnd;
     }
 }

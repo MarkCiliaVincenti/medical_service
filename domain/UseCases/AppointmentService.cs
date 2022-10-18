@@ -4,7 +4,7 @@ public class AppointmentService
 {
     public readonly IAppointmentRepository _repository;
 
-    AppointmentService(IAppointmentRepository repository)
+    public AppointmentService(IAppointmentRepository repository)
     {
         _repository = repository;
     }
@@ -21,11 +21,14 @@ public class AppointmentService
 
     public Result<List<Appointment>> GetFreeDates(string specialization)
     {
+        if (string.IsNullOrEmpty(specialization))
+            return Result.Err<List<Appointment>>("Specialization not specified");
+
         var freeDates = _repository.GetFreeDates(specialization);
 
         if (freeDates is not null)
             return Result.Ok<List<Appointment>>(freeDates);
 
-        return Result.Err<List<Appointment>>("Failed to create appointment");
+        return Result.Err<List<Appointment>>("Free dates not found");
     }
 }

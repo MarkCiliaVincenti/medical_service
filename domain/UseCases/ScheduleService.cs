@@ -9,7 +9,7 @@ public class ScheduleService
         _repository = repository;
     }
 
-    Result<Schedule> GetSchedule(int doctorID, DateOnly date)
+    public Result<Schedule> GetSchedule(int doctorID, DateOnly date)
     {
         var schedule = _repository.GetSchedule(doctorID, date);
 
@@ -19,7 +19,7 @@ public class ScheduleService
         return Result.Err<Schedule>("Schedule not found");
     }
 
-    Result<Schedule> AddSchedule(ScheduleForm form)
+    public Result<Schedule> AddSchedule(ScheduleForm form)
     {
         var schedule = _repository.AddSchedule(form);
 
@@ -28,7 +28,7 @@ public class ScheduleService
 
         return Result.Err<Schedule>("Failed to add schedule");
     }
-    Result<Schedule> ChangeSchedule(ScheduleForm form)
+    public Result<Schedule> ChangeSchedule(ScheduleForm form)
     {
         var schedule = _repository.ChangeSchedule(form);
 

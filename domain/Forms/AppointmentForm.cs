@@ -6,7 +6,7 @@ public class AppointmentForm
     public int DoctorID { get; set; }
     public DateOnly Date { get; set; }
 
-    AppointmentForm(int patientID, int doctorID, DateOnly date)
+    public AppointmentForm(int patientID, int doctorID, DateOnly date)
     {
         PatientID = patientID;
         DoctorID = doctorID;

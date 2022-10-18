@@ -9,7 +9,7 @@ public class DoctorService
         _repository = repository;
     }
 
-    Result<Doctor> CreateDoctor(DoctorForm form)
+    public Result<Doctor> CreateDoctor(DoctorForm form)
     {
         if (string.IsNullOrEmpty(form.FullName))
             return Result.Err<Doctor>("Name not specified");
@@ -25,7 +25,7 @@ public class DoctorService
         return Result.Err<Doctor>("Failed to create doctor");
     }
 
-    Result DeleteDoctor(int id)
+    public Result DeleteDoctor(int id)
     {
         bool result = _repository.DeleteDoctor(id);
 
@@ -35,7 +35,7 @@ public class DoctorService
         return Result.Err("Failed to delete doctor");
     }
 
-    Result<Doctor> GetDoctorByID(int id)
+    public Result<Doctor> GetDoctorByID(int id)
     {
         var doctor = _repository.GetDoctorByID(id);
 
@@ -44,7 +44,7 @@ public class DoctorService
 
         return Result.Err<Doctor>("Doctor not found");
     }
-    Result<List<Doctor>> GetDoctorsBySpecialization(string specialization)
+    public Result<List<Doctor>> GetDoctorsBySpecialization(string specialization)
     {
         if (string.IsNullOrEmpty(specialization))
             return Result.Err<List<Doctor>>("Specialization not specified");
@@ -57,7 +57,7 @@ public class DoctorService
         return Result.Err<List<Doctor>>("Doctors not found");
     }
 
-    Result<List<Doctor>> GetAllDoctors()
+    public Result<List<Doctor>> GetAllDoctors()
     {
         var doctors = _repository.GetAllDoctors();
 
