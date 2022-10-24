@@ -2,7 +2,7 @@ namespace Domain;
 
 public interface IAppointmentRepository
 {
-    Appointment? CreateAppointment(AppointmentForm form);
-
-    List<Appointment>? GetFreeDates(string specialization);
+    Appointment? CreateAppointment(DateTime date, int doctorID);
+    Appointment? CreateAppointment(DateTime date);
+    List<DateTime>? GetFreeDates(string specialization);
 }

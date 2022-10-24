@@ -5,15 +5,12 @@ public class Appointment
     public DateTime End { get; set; }
     public int PatientID { get; set; }
     public int DoctorID { get; set; }
-    public bool Free { get; set; }
 
-    public Appointment(DateTime start, DateTime end, int patientID, int doctorID,
-        bool free = true)
+    public Appointment(DateTime start, DateTime end, int patientID, int doctorID)
     {
         Start = start;
         End = end;
         PatientID = patientID;
         DoctorID = doctorID;
-        Free = free;
     }
 }

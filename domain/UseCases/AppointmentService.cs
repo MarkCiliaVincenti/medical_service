@@ -9,9 +9,9 @@ public class AppointmentService
         _repository = repository;
     }
     
-    public Result<Appointment> CreateAppointment(AppointmentForm form)
+    public Result<Appointment> CreateAppointment(DateTime date, int doctorID)
     {
-        var appointment = _repository.CreateAppointment(form);
+        var appointment = _repository.CreateAppointment(date, doctorID);
 
         if (appointment is not null)
             return Result.Ok<Appointment>(appointment);
@@ -19,16 +19,26 @@ public class AppointmentService
         return Result.Err<Appointment>("Failed to create appointment");
     }
 
-    public Result<List<Appointment>> GetFreeDates(string specialization)
+    public Result<Appointment> CreateAppointment(DateTime date)
+    {
+        var appointment = _repository.CreateAppointment(date);
+
+        if (appointment is not null)
+            return Result.Ok<Appointment>(appointment);
+
+        return Result.Err<Appointment>("Failed to create appointment");
+    }
+
+    public Result<List<DateTime>> GetFreeDates(string specialization)
     {
         if (string.IsNullOrEmpty(specialization))
-            return Result.Err<List<Appointment>>("Specialization not specified");
+            return Result.Err<List<DateTime>>("Specialization not specified");
 
         var freeDates = _repository.GetFreeDates(specialization);
 
         if (freeDates is not null)
-            return Result.Ok<List<Appointment>>(freeDates);
+            return Result.Ok<List<DateTime>>(freeDates);
 
-        return Result.Err<List<Appointment>>("Free dates not found");
+        return Result.Err<List<DateTime>>("Free dates not found");
     }
 }
