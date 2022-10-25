@@ -11,6 +11,9 @@ public class AppointmentService
     
     public Result<Appointment> CreateAppointment(DateTime date, int doctorID)
     {
+        if (_repository.AppointmentExists(date, doctorID))
+            return Result.Err<Appointment>("Appointment with this doctor for this date already exists");
+        
         var appointment = _repository.CreateAppointment(date, doctorID);
 
         if (appointment is not null)
