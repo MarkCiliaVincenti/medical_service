@@ -6,11 +6,28 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace repository.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.CreateTable(
+                name: "Appointments",
+                columns: table => new
+                {
+                    ID = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Start = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    End = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    PatientID = table.Column<int>(type: "INTEGER", nullable: false),
+                    DoctorID = table.Column<int>(type: "INTEGER", nullable: false),
+                    Specialization = table.Column<string>(type: "TEXT", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Appointments", x => x.ID);
+                });
+
             migrationBuilder.CreateTable(
                 name: "Doctors",
                 columns: table => new
@@ -42,19 +59,6 @@ namespace repository.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Specialization",
-                columns: table => new
-                {
-                    ID = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Name = table.Column<string>(type: "TEXT", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Specialization", x => x.ID);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Users",
                 columns: table => new
                 {
@@ -69,34 +73,6 @@ namespace repository.Migrations
                 {
                     table.PrimaryKey("PK_Users", x => x.ID);
                 });
-
-            migrationBuilder.CreateTable(
-                name: "Appointments",
-                columns: table => new
-                {
-                    ID = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Start = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    End = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    PatientID = table.Column<int>(type: "INTEGER", nullable: false),
-                    DoctorID = table.Column<int>(type: "INTEGER", nullable: false),
-                    SpecializationID = table.Column<int>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Appointments", x => x.ID);
-                    table.ForeignKey(
-                        name: "FK_Appointments_Specialization_SpecializationID",
-                        column: x => x.SpecializationID,
-                        principalTable: "Specialization",
-                        principalColumn: "ID",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Appointments_SpecializationID",
-                table: "Appointments",
-                column: "SpecializationID");
         }
 
         /// <inheritdoc />
@@ -113,9 +89,6 @@ namespace repository.Migrations
 
             migrationBuilder.DropTable(
                 name: "Users");
-
-            migrationBuilder.DropTable(
-                name: "Specialization");
         }
     }
 }

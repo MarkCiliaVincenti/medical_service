@@ -12,13 +12,14 @@ public class DoctorRepositoryImpl : IDoctorRepository
     }
     public Doctor? CreateDoctor(DoctorForm form)
     {
-        _context.Doctors.Append(
+        _context.Doctors.Add(
             new DoctorModel
             {
                 FullName = form.FullName,
                 Specialization = form.Specialization
             }
         );
+        _context.SaveChanges();
 
         var doctor = _context.Doctors.FirstOrDefault(doctor => doctor.FullName == form.FullName &&
             doctor.Specialization == form.Specialization);

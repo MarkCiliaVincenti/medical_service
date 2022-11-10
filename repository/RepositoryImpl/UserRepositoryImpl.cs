@@ -32,18 +32,17 @@ public class UserRepositoryImpl : IUserRepository
         );
     }
     public User? CreateUser(UserForm form)
-    {     
-        int newID = _context.Users.Count() == 0 ? 1 : _context.Users.Last().ID;
-        _context.Users.Append(
+    {
+        _context.Users.Add(
             new UserModel
             {
-                ID = newID,
                 PhoneNumber = form.PhoneNumber,
                 FullName = form.FullName,
                 Login = form.Login,
                 Password = form.Password
             }
         );
+        _context.SaveChanges();
 
         var user = _context.Users.FirstOrDefault(user => user.Login == form.Login);
 

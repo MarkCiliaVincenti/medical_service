@@ -20,6 +20,7 @@ public class AppointmentRepositoryImpl : IAppointmentRepository
           DoctorID = form.DoctorID
       };
       _context.Appointments.Add(appointment);
+      _context.SaveChanges();
 
       var check = _context.Appointments.FirstOrDefault(ap => ap.DoctorID == form.DoctorID &&
           ap.PatientID == form.PatientID && ap.Start == form.Start && ap.End == form.End);

@@ -17,21 +17,6 @@ namespace repository.Migrations
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.0");
 
-            modelBuilder.Entity("Domain.Specialization", b =>
-                {
-                    b.Property<int>("ID")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("ID");
-
-                    b.ToTable("Specialization");
-                });
-
             modelBuilder.Entity("Repository.AppointmentModel", b =>
                 {
                     b.Property<int>("ID")
@@ -47,15 +32,14 @@ namespace repository.Migrations
                     b.Property<int>("PatientID")
                         .HasColumnType("INTEGER");
 
-                    b.Property<int>("SpecializationID")
-                        .HasColumnType("INTEGER");
+                    b.Property<string>("Specialization")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("Start")
                         .HasColumnType("TEXT");
 
                     b.HasKey("ID");
-
-                    b.HasIndex("SpecializationID");
 
                     b.ToTable("Appointments");
                 });
@@ -127,17 +111,6 @@ namespace repository.Migrations
                     b.HasKey("ID");
 
                     b.ToTable("Users");
-                });
-
-            modelBuilder.Entity("Repository.AppointmentModel", b =>
-                {
-                    b.HasOne("Domain.Specialization", "Specialization")
-                        .WithMany()
-                        .HasForeignKey("SpecializationID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Specialization");
                 });
 #pragma warning restore 612, 618
         }

@@ -25,19 +25,19 @@ public class ScheduleRepositoryImpl : IScheduleRepository
     }
     public Schedule? AddSchedule(ScheduleForm form)
     {
-      int newID = _context.Schedules.Count() == 0 ? 1 : _context.Schedules.Last().ID;
-      _context.Schedules.Append(
+      _context.Schedules.Add(
           new ScheduleModel
           {
-            ID = newID,
             DoctorID = form.DoctorID,
             Date = form.Date,
             DayStart = form.DayStart,
             DayEnd = form.DayEnd
           }
       );
+      _context.SaveChanges();
 
-      var schedule = _context.Schedules.FirstOrDefault(sch => sch.ID == newID);
+      var schedule = _context.Schedules.FirstOrDefault(sch => sch.DoctorID == form.DoctorID &&
+          sch.Date == form.Date && sch.DayStart == form.DayStart && sch.DayEnd == sch.DayEnd);
 
       if (schedule is null) return null;
 
@@ -48,17 +48,17 @@ public class ScheduleRepositoryImpl : IScheduleRepository
           schedule.DayEnd
       );
     }
-    public Schedule? ChangeSchedule(ScheduleForm form)
+    public Schedule? ChangeSchedule(ScheduleForm actual, ScheduleForm recent)
     {
-      var schedule = _context.Schedules.FirstOrDefault(sch => sch.DoctorID == form.DoctorID &&
-          sch.Date == form.Date && sch.DayStart == form.DayStart && sch.DayEnd == form.DayEnd);
+      var schedule = _context.Schedules.FirstOrDefault(sch => sch.DoctorID == actual.DoctorID &&
+          sch.Date == actual.Date && sch.DayStart == actual.DayStart && sch.DayEnd == actual.DayEnd);
 
       if (schedule is not null)
       {
-          schedule.DoctorID = form.DoctorID;
-          schedule.Date = form.Date;
-          schedule.DayStart = form.DayStart;
-          schedule.DayEnd = form.DayEnd;
+          schedule.DoctorID = recent.DoctorID;
+          schedule.Date = recent.Date;
+          schedule.DayStart = recent.DayStart;
+          schedule.DayEnd = recent.DayEnd;
           _context.Schedules.Update(schedule);
           _context.SaveChanges();
       }

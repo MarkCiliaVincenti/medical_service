@@ -97,16 +97,18 @@ public class ScheduleServiceTests
     {
         //Arrange
         string expected_error = string.Empty;
-        int doctorID = 54;
-        var date = new DateOnly(1, 1, 1);
-        var dayStart = new TimeOnly(1, 1, 1);
-        var dayEnd = new TimeOnly(1, 1, 1);
-        var form = new ScheduleForm(doctorID, date, dayStart, dayEnd);
-        _scheduleRepositoryMock.Setup(repository => repository.ChangeSchedule(form))
-            .Returns(() => new Schedule(doctorID, date, dayStart, dayEnd));
+        int doctorID = 123;
+        DateOnly actualDate = new DateOnly(2022, 2, 22);
+        DateOnly recentDate = new DateOnly(450, 1, 1);
+        TimeOnly start = new TimeOnly(0, 0, 0);
+        TimeOnly end = new TimeOnly(23, 59, 01);
+        var actual = new ScheduleForm(doctorID, actualDate, start, end);
+        var recent = new ScheduleForm(doctorID, recentDate, start, end);
+        _scheduleRepositoryMock.Setup(repository => repository.ChangeSchedule(actual, recent))
+            .Returns(() => new Schedule(doctorID, recentDate, start, end));
         
         //Act
-        var result = _scheduleService.ChangeSchedule(form);
+        var result = _scheduleService.ChangeSchedule(actual, recent);
         
         //Assert
         Assert.True(result.Success);
@@ -118,16 +120,18 @@ public class ScheduleServiceTests
     {
         //Arrange
         string expected_error = "Failed to change schedule";
-        int doctorID = 54;
-        var date = new DateOnly(1, 1, 1);
-        var dayStart = new TimeOnly(1, 1, 1);
-        var dayEnd = new TimeOnly(1, 1, 1);
-        var form = new ScheduleForm(doctorID, date, dayStart, dayEnd);
-        _scheduleRepositoryMock.Setup(repository => repository.ChangeSchedule(form))
+        int doctorID = 123;
+        DateOnly actualDate = new DateOnly(2022, 2, 22);
+        DateOnly recentDate = new DateOnly(450, 1, 1);
+        TimeOnly start = new TimeOnly(0, 0, 0);
+        TimeOnly end = new TimeOnly(23, 59, 01);
+        var actual = new ScheduleForm(doctorID, actualDate, start, end);
+        var recent = new ScheduleForm(doctorID, recentDate, start, end);
+        _scheduleRepositoryMock.Setup(repository => repository.ChangeSchedule(actual, recent))
             .Returns(() => null);
         
         //Act
-        var result = _scheduleService.ChangeSchedule(form);
+        var result = _scheduleService.ChangeSchedule(actual, recent);
         
         //Assert
         Assert.True(result.IsFail);
