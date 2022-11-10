@@ -9,12 +9,20 @@ public class AppointmentService
         _repository = repository;
     }
     
-    public Result<Appointment> CreateAppointment(DateTime date, int doctorID)
+    public Result<Appointment> CreateAppointment(AppointmentForm form)
     {
-        if (_repository.AppointmentExists(date, doctorID))
+        if (form.DoctorID == AppointmentForm.EmptyDoctorID)
+        {
+            //  обработать случай EmptyDoctorID
+        }
+
+        if (form.Specialization == string.Empty)
+            return Result.Err<Appointment>("Specialization not specified");
+
+        if (_repository.AppointmentExists(form))
             return Result.Err<Appointment>("Appointment with this doctor for this date already exists");
         
-        var appointment = _repository.CreateAppointment(date, doctorID);
+        var appointment = _repository.CreateAppointment(form);
 
         if (appointment is not null)
             return Result.Ok<Appointment>(appointment);
@@ -22,26 +30,31 @@ public class AppointmentService
         return Result.Err<Appointment>("Failed to create appointment");
     }
 
-    public Result<Appointment> CreateAppointment(DateTime date)
-    {
-        var appointment = _repository.CreateAppointment(date);
-
-        if (appointment is not null)
-            return Result.Ok<Appointment>(appointment);
-
-        return Result.Err<Appointment>("Failed to create appointment");
-    }
-
-    public Result<List<DateTime>> GetFreeDates(string specialization)
+    public Result<List<(DateTime, DateTime)>> GetFreeDates(string specialization, DateOnly date)
     {
         if (string.IsNullOrEmpty(specialization))
-            return Result.Err<List<DateTime>>("Specialization not specified");
+            return Result.Err<List<(DateTime, DateTime)>>("Specialization not specified");
 
-        var freeDates = _repository.GetFreeDates(specialization);
+        var busyDates = _repository.GetAllDates(specialization, date);
 
-        if (freeDates is not null)
-            return Result.Ok<List<DateTime>>(freeDates);
+        var start = date.ToDateTime(new TimeOnly(0, 0, 0));
+        var end = date.ToDateTime(new TimeOnly(23, 59, 59));
 
-        return Result.Err<List<DateTime>>("Free dates not found");
+        if (busyDates.Count == 0)
+            return Result.Ok(new List<(DateTime, DateTime)>{(start, end)});
+
+        var freeDates = new List<(DateTime, DateTime)>();
+        var lastDate = (start, start);
+
+        foreach(var currentDate in busyDates)
+        {
+            freeDates.Add((lastDate.Item2, currentDate.Item1));
+            lastDate = currentDate;
+        }
+
+        if (busyDates.Last().Item2 != end)
+            freeDates.Add((busyDates.Last().Item2, end));
+
+        return Result.Ok<List<(DateTime, DateTime)>>(freeDates);
     }
 }

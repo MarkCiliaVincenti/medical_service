@@ -14,22 +14,44 @@ public class AppointmentServiceTests
     }
 
     [Fact]
-    public void CreateAppointmentWithDoctorOk_ShouldOk()
+    public void CreateAppointmentOk_ShouldOk()
     {
         //Arrange
         string expected_error = string.Empty;
         var date = new DateTime(1, 1, 1);
+        int patientID = 10;
         int doctorID = 5;
-        _appointmentRepositoryMock.Setup(repository => repository.AppointmentExists(date, doctorID))
+        string specialization = "some spec";
+        var form = new AppointmentForm(date, date, patientID, doctorID, specialization);
+        _appointmentRepositoryMock.Setup(repository => repository.AppointmentExists(form))
             .Returns(() => false);
-        _appointmentRepositoryMock.Setup(repository => repository.CreateAppointment(date, doctorID))
+        _appointmentRepositoryMock.Setup(repository => repository.CreateAppointment(form))
             .Returns(() => new Appointment(new DateTime(1, 1, 1), new DateTime(1, 1, 1), 1, 1));
         
         //Act
-        var result = _appointmentService.CreateAppointment(date, doctorID);
+        var result = _appointmentService.CreateAppointment(form);
         
         //Assert
         Assert.True(result.Success);
+        Assert.Equal(expected_error, result.Error);
+    }
+
+    [Fact]
+    public void CreateAppointmentEmptySpecialization_ShouldFail()
+    {
+        //Arrange
+        string expected_error = "Specialization not specified";
+        var date = new DateTime(1, 1, 1);
+        int patientID = 10;
+        int doctorID = 5;
+        string specialization = string.Empty;
+        var form = new AppointmentForm(date, date, patientID, doctorID, specialization);
+        
+        //Act
+        var result = _appointmentService.CreateAppointment(form);
+        
+        //Assert
+        Assert.True(result.IsFail);
         Assert.Equal(expected_error, result.Error);
     }
 
@@ -39,12 +61,15 @@ public class AppointmentServiceTests
         //Arrange
         string expected_error = "Appointment with this doctor for this date already exists";
         var date = new DateTime(1, 1, 1);
+        int patientID = 10;
         int doctorID = 5;
-        _appointmentRepositoryMock.Setup(repository => repository.AppointmentExists(date, doctorID))
+        string specialization = "some spec";
+        var form = new AppointmentForm(date, date, patientID, doctorID, specialization);
+        _appointmentRepositoryMock.Setup(repository => repository.AppointmentExists(form))
             .Returns(() => true);
         
         //Act
-        var result = _appointmentService.CreateAppointment(date, doctorID);
+        var result = _appointmentService.CreateAppointment(form);
         
         //Assert
         Assert.True(result.IsFail);
@@ -52,35 +77,22 @@ public class AppointmentServiceTests
     }
 
     [Fact]
-    public void CreateAppointmentWithDoctorOtherError_ShouldFail()
-    {
-        //Arrange
-        string expected_error = "Failed to create appointment";
-        var date = new DateTime(1, 1, 1);
-        int doctorID = 5;
-        _appointmentRepositoryMock.Setup(repository => repository.AppointmentExists(date, doctorID))
-            .Returns(() => false);
-        _appointmentRepositoryMock.Setup(repository => repository.CreateAppointment(date, doctorID))
-            .Returns(() => null);
-        
-        //Act
-        var result = _appointmentService.CreateAppointment(date, doctorID);
-        
-        //Assert
-        Assert.True(result.IsFail);
-        Assert.Equal(expected_error, result.Error);
-    }
-
-    public void CreateAppointmentOk_ShouldOk()
+    public void CreateAppointmentWithoutDoctor_ShouldOk()
     {
         //Arrange
         string expected_error = string.Empty;
         var date = new DateTime(1, 1, 1);
-        _appointmentRepositoryMock.Setup(repository => repository.CreateAppointment(date))
+        int patientID = 10;
+        int doctorID = -0xdeadb0b;
+        string specialization = "some spec";
+        var form = new AppointmentForm(date, date, patientID, doctorID, specialization);
+        _appointmentRepositoryMock.Setup(repository => repository.AppointmentExists(form))
+            .Returns(() => false);
+        _appointmentRepositoryMock.Setup(repository => repository.CreateAppointment(form))
             .Returns(() => new Appointment(new DateTime(1, 1, 1), new DateTime(1, 1, 1), 1, 1));
         
         //Act
-        var result = _appointmentService.CreateAppointment(date);
+        var result = _appointmentService.CreateAppointment(form);
         
         //Assert
         Assert.True(result.Success);
@@ -93,31 +105,20 @@ public class AppointmentServiceTests
         //Arrange
         string expected_error = "Failed to create appointment";
         var date = new DateTime(1, 1, 1);
-        _appointmentRepositoryMock.Setup(repository => repository.CreateAppointment(date))
+        int patientID = 10;
+        int doctorID = 5;
+        string specialization = "some spec";
+        var form = new AppointmentForm(date, date, patientID, doctorID, specialization);
+        _appointmentRepositoryMock.Setup(repository => repository.AppointmentExists(form))
+            .Returns(() => false);
+        _appointmentRepositoryMock.Setup(repository => repository.CreateAppointment(form))
             .Returns(() => null);
         
         //Act
-        var result = _appointmentService.CreateAppointment(date);
+        var result = _appointmentService.CreateAppointment(form);
         
         //Assert
         Assert.True(result.IsFail);
-        Assert.Equal(expected_error, result.Error);
-    }
-
-    [Fact]
-    public void GetFreeDatesOk_ShouldOk()
-    {
-        //Arrange
-        string expected_error = string.Empty;
-        string specialization = "gigachad";
-        _appointmentRepositoryMock.Setup(repository => repository.GetFreeDates(specialization))
-            .Returns(() => new List<DateTime>());
-        
-        //Act
-        var result = _appointmentService.GetFreeDates(specialization);
-        
-        //Assert
-        Assert.True(result.Success);
         Assert.Equal(expected_error, result.Error);
     }
 
@@ -127,9 +128,10 @@ public class AppointmentServiceTests
         //Arrange
         string expected_error = "Specialization not specified";
         string specialization = string.Empty;
+        DateOnly date = new DateOnly(2021, 12, 30);
         
         //Act
-        var result = _appointmentService.GetFreeDates(specialization);
+        var result = _appointmentService.GetFreeDates(specialization, date);
         
         //Assert
         Assert.True(result.IsFail);
@@ -137,19 +139,83 @@ public class AppointmentServiceTests
     }
 
     [Fact]
-    public void GetFreeDatesNotFound_ShouldFail()
+    public void GetFreeDatesWithEmptyRepository_ShouldOk()
     {
         //Arrange
-        string expected_error = "Free dates not found";
+        string expected_error = string.Empty;
         string specialization = "gigachad";
-        _appointmentRepositoryMock.Setup(repository => repository.GetFreeDates(specialization))
-            .Returns(() => null);
+        DateOnly date = new DateOnly(2021, 12, 30);
+        var start = date.ToDateTime(new TimeOnly(0, 0, 0));
+        var end = date.ToDateTime(new TimeOnly(23, 59, 59));
+        var exceptedDates = new List<(DateTime, DateTime)>{(start, end)};
+        _appointmentRepositoryMock.Setup(repository => repository.GetAllDates(specialization, date))
+            .Returns(() => new List<(DateTime, DateTime)>());
         
         //Act
-        var result = _appointmentService.GetFreeDates(specialization);
+        var result = _appointmentService.GetFreeDates(specialization, date);
         
         //Assert
-        Assert.True(result.IsFail);
+        Assert.True(result.Success);
         Assert.Equal(expected_error, result.Error);
+        Assert.Equal(exceptedDates, result.Value);
+    }
+
+    [Fact]
+    public void GetFreeDatesWithOneAppointment_ShouldOk()
+    {
+        //Arrange
+        string expected_error = string.Empty;
+        string specialization = "gigachad";
+        DateOnly date = new DateOnly(2021, 12, 30);
+        var start = date.ToDateTime(new TimeOnly(0, 0, 0));
+        var end = date.ToDateTime(new TimeOnly(23, 59, 59));
+        var exceptedDates = new List<(DateTime, DateTime)>
+            {
+                (start, start.AddHours(2).AddMinutes(40)),
+                (start.AddHours(4).AddMinutes(5), end)
+            };
+        _appointmentRepositoryMock.Setup(repository => repository.GetAllDates(specialization, date))
+            .Returns(() => new List<(DateTime, DateTime)>
+            {
+                (start.AddHours(2).AddMinutes(40), start.AddHours(4).AddMinutes(5))
+            });
+        
+        //Act
+        var result = _appointmentService.GetFreeDates(specialization, date);
+        
+        //Assert
+        Assert.True(result.Success);
+        Assert.Equal(expected_error, result.Error);
+        Assert.Equal(exceptedDates, result.Value);
+    }
+
+    [Fact]
+    public void GetFreeDatesWithManyAppointment_ShouldOk()
+    {
+        //Arrange
+        string expected_error = string.Empty;
+        string specialization = "gigachad";
+        DateOnly date = new DateOnly(2021, 12, 30);
+        var start = date.ToDateTime(new TimeOnly(0, 0, 0));
+        var end = date.ToDateTime(new TimeOnly(23, 59, 59));
+        var exceptedDates = new List<(DateTime, DateTime)>
+            {
+                (start, start.AddHours(2).AddMinutes(40)),
+                (start.AddHours(4).AddMinutes(5), start.AddHours(8).AddMinutes(12))
+            };
+        _appointmentRepositoryMock.Setup(repository => repository.GetAllDates(specialization, date))
+            .Returns(() => new List<(DateTime, DateTime)>
+            {
+                (start.AddHours(2).AddMinutes(40), start.AddHours(4).AddMinutes(5)),
+                (start.AddHours(8).AddMinutes(12), start.AddHours(23).AddMinutes(59).AddSeconds(59))
+            });
+        
+        //Act
+        var result = _appointmentService.GetFreeDates(specialization, date);
+        
+        //Assert
+        Assert.True(result.Success);
+        Assert.Equal(expected_error, result.Error);
+        Assert.Equal(exceptedDates, result.Value);
     }
 }
