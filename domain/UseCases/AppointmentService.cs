@@ -11,9 +11,9 @@ public class AppointmentService
     
     public Result<Appointment> CreateAppointment(AppointmentForm form)
     {
-        if (form.DoctorID == -0xdeadb0b)
+        if (form.DoctorID == AppointmentForm.EmptyDoctorID)
         {
-            //  обработать случай 0xdeadb0b -- отдельно в форме прописать специализацию?
+            //  обработать случай EmptyDoctorID
         }
 
         if (form.Specialization == string.Empty)
@@ -30,34 +30,31 @@ public class AppointmentService
         return Result.Err<Appointment>("Failed to create appointment");
     }
 
-    public Result<List<DateTime>> GetFreeDates(string specialization)
+    public Result<List<(DateTime, DateTime)>> GetFreeDates(string specialization, DateOnly date)
     {
         if (string.IsNullOrEmpty(specialization))
-            return Result.Err<List<DateTime>>("Specialization not specified");
+            return Result.Err<List<(DateTime, DateTime)>>("Specialization not specified");
 
-        var busyDates = _repository.GetAllDates(specialization);
+        var busyDates = _repository.GetAllDates(specialization, date);
 
-        var allDates = new List<DateTime>();
-        for(int i = 0; i < 30; ++i) // диапазон дат, хардкод
+        var start = date.ToDateTime(new TimeOnly(0, 0, 0));
+        var end = date.ToDateTime(new TimeOnly(23, 59, 59));
+
+        if (busyDates.Count == 0)
+            return Result.Ok(new List<(DateTime, DateTime)>{(start, end)});
+
+        var freeDates = new List<(DateTime, DateTime)>();
+        var lastDate = (start, start);
+
+        foreach(var currentDate in busyDates)
         {
-            allDates.Append(DateTime.Now.AddDays(i));
+            freeDates.Add((lastDate.Item2, currentDate.Item1));
+            lastDate = currentDate;
         }
 
-        if (busyDates is null)
-            return Result.Ok<List<DateTime>>(allDates);
+        if (busyDates.Last().Item2 != end)
+            freeDates.Add((busyDates.Last().Item2, end));
 
-        var freeDates = new List<DateTime>();
-        foreach(var date in allDates)
-        {
-            if (!busyDates.Contains(date))
-            {
-                freeDates.Append(date);
-            }
-        }
-
-        if (freeDates.Count != 0)
-            return Result.Ok<List<DateTime>>(freeDates);
-
-        return Result.Err<List<DateTime>>("Free dates not found"); 
+        return Result.Ok<List<(DateTime, DateTime)>>(freeDates);
     }
 }
