@@ -9,8 +9,8 @@ build/
 [Oo]bj/
 
 # Database files
-[Mm]igrations/
+#[Mm]igrations/
 *.db
 
 # Private information
-appsettings.json
+#appsettings.json
