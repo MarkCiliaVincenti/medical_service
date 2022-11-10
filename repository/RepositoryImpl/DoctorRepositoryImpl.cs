@@ -12,17 +12,16 @@ public class DoctorRepositoryImpl : IDoctorRepository
     }
     public Doctor? CreateDoctor(DoctorForm form)
     {
-        int newID = _context.Doctors.Count() == 0 ? 1 : _context.Doctors.Last().ID;
         _context.Doctors.Append(
             new DoctorModel
             {
-                ID = newID,
                 FullName = form.FullName,
                 Specialization = form.Specialization
             }
         );
 
-        var doctor = _context.Doctors.FirstOrDefault(doctor => doctor.ID == newID);
+        var doctor = _context.Doctors.FirstOrDefault(doctor => doctor.FullName == form.FullName &&
+            doctor.Specialization == form.Specialization);
 
         if (doctor is null) return null;
 
@@ -51,32 +50,14 @@ public class DoctorRepositoryImpl : IDoctorRepository
 
         return new Doctor(doctor.ID, doctor.FullName, doctor.Specialization);
     }
-    public List<Doctor>? GetDoctorsBySpecialization(string specialization)
-    {
-        var doctors = _context.Doctors.Where(doctor => doctor.Specialization == specialization).ToList();
+    public List<Doctor> GetDoctorsBySpecialization(string specialization)
+        => _context.Doctors
+                .Where(doctor => doctor.Specialization == specialization)
+                .Select(doctor => new Doctor(doctor.ID, doctor.FullName, doctor.Specialization))
+                .ToList();
 
-        if (doctors.Count == 0) return null;
-
-        List<Doctor> result = new List<Doctor>();
-        foreach(var doctor in doctors)
-        {
-            result.Append(new Doctor(doctor.ID, doctor.FullName, doctor.Specialization));
-        }
-
-        return result;
-    }
-    public List<Doctor>? GetAllDoctors()
-    {
-        var doctors = _context.Doctors.ToList();
-
-        if (doctors.Count == 0) return null;
-
-        List<Doctor> result = new List<Doctor>();
-        foreach(DoctorModel doctor in doctors)
-        {
-            result.Append(new Doctor(doctor.ID, doctor.FullName, doctor.Specialization));
-        }
-
-        return result;
-    }
+    public List<Doctor> GetAllDoctors()
+        => _context.Doctors
+                .Select(doctor => new Doctor(doctor.ID, doctor.FullName, doctor.Specialization))
+                .ToList();
 }

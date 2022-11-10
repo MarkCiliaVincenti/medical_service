@@ -8,5 +8,5 @@ public class AppointmentModel
     public DateTime End { get; set; }
     public int PatientID { get; set; }
     public int DoctorID { get; set; }
-    public Specialization Specialization { get; set; }
+    public string Specialization { get; set; } = "";
 }

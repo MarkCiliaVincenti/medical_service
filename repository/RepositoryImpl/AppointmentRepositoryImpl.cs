@@ -12,10 +12,8 @@ public class AppointmentRepositoryImpl : IAppointmentRepository
     }
     public Appointment? CreateAppointment(AppointmentForm form)
     {
-      int newID = _context.Appointments.Count() == 0 ? 1 : _context.Appointments.Last().ID;
       var appointment = new AppointmentModel
       {
-          ID = newID,
           Start = form.Start,
           End = form.End,
           PatientID = form.PatientID,
@@ -45,18 +43,11 @@ public class AppointmentRepositoryImpl : IAppointmentRepository
       return true;
     }
 
-    public List<DateTime>? GetAllDates(string specialization)
+    public List<(DateTime, DateTime)> GetAllDates(string specialization, DateOnly date)
     {
-      var appointments = _context.Appointments.Where(ap => ap.Specialization.Name == specialization);
-
-      if (appointments is null) return null;
-
-      List<DateTime> dates = new List<DateTime>();
-      foreach(var appointment in appointments)
-      {
-        dates.Append(appointment.Start.Date);
-      }
-
-      return dates;
+      var dateTime = date.ToDateTime(new TimeOnly(0, 0, 0));
+      return _context.Appointments
+          .Where(ap => ap.Specialization == specialization && ap.Start.Date == dateTime)
+          .Select(ap => new Tuple<DateTime, DateTime>(ap.Start, ap.End).ToValueTuple()).ToList();
     }
 }
