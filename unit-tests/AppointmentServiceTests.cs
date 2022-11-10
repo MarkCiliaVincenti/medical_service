@@ -123,31 +123,15 @@ public class AppointmentServiceTests
     }
 
     [Fact]
-    public void GetFreeDatesOk_ShouldOk()
-    {
-        //Arrange
-        string expected_error = string.Empty;
-        string specialization = "gigachad";
-        _appointmentRepositoryMock.Setup(repository => repository.GetAllDates(specialization))
-            .Returns(() => null);
-        
-        //Act
-        var result = _appointmentService.GetFreeDates(specialization);
-        
-        //Assert
-        Assert.True(result.Success);
-        Assert.Equal(expected_error, result.Error);
-    }
-
-    [Fact]
     public void GetFreeDatesEmptySpecialization_ShouldFail()
     {
         //Arrange
         string expected_error = "Specialization not specified";
         string specialization = string.Empty;
+        DateOnly date = new DateOnly(2021, 12, 30);
         
         //Act
-        var result = _appointmentService.GetFreeDates(specialization);
+        var result = _appointmentService.GetFreeDates(specialization, date);
         
         //Assert
         Assert.True(result.IsFail);
@@ -155,24 +139,83 @@ public class AppointmentServiceTests
     }
 
     [Fact]
-    public void GetFreeDatesNotFound_ShouldFail()
+    public void GetFreeDatesWithEmptyRepository_ShouldOk()
     {
         //Arrange
-        string expected_error = "Free dates not found";
+        string expected_error = string.Empty;
         string specialization = "gigachad";
-        var busyDates = new List<DateTime>();
-        for(int i = 0; i < 30; ++i)
-        {
-            busyDates.Append(DateTime.Now.AddDays(i));
-        }
-        _appointmentRepositoryMock.Setup(repository => repository.GetAllDates(specialization))
-            .Returns(() => busyDates);
+        DateOnly date = new DateOnly(2021, 12, 30);
+        var start = date.ToDateTime(new TimeOnly(0, 0, 0));
+        var end = date.ToDateTime(new TimeOnly(23, 59, 59));
+        var exceptedDates = new List<(DateTime, DateTime)>{(start, end)};
+        _appointmentRepositoryMock.Setup(repository => repository.GetAllDates(specialization, date))
+            .Returns(() => new List<(DateTime, DateTime)>());
         
         //Act
-        var result = _appointmentService.GetFreeDates(specialization);
+        var result = _appointmentService.GetFreeDates(specialization, date);
         
         //Assert
-        Assert.True(result.IsFail);
+        Assert.True(result.Success);
         Assert.Equal(expected_error, result.Error);
+        Assert.Equal(exceptedDates, result.Value);
+    }
+
+    [Fact]
+    public void GetFreeDatesWithOneAppointment_ShouldOk()
+    {
+        //Arrange
+        string expected_error = string.Empty;
+        string specialization = "gigachad";
+        DateOnly date = new DateOnly(2021, 12, 30);
+        var start = date.ToDateTime(new TimeOnly(0, 0, 0));
+        var end = date.ToDateTime(new TimeOnly(23, 59, 59));
+        var exceptedDates = new List<(DateTime, DateTime)>
+            {
+                (start, start.AddHours(2).AddMinutes(40)),
+                (start.AddHours(4).AddMinutes(5), end)
+            };
+        _appointmentRepositoryMock.Setup(repository => repository.GetAllDates(specialization, date))
+            .Returns(() => new List<(DateTime, DateTime)>
+            {
+                (start.AddHours(2).AddMinutes(40), start.AddHours(4).AddMinutes(5))
+            });
+        
+        //Act
+        var result = _appointmentService.GetFreeDates(specialization, date);
+        
+        //Assert
+        Assert.True(result.Success);
+        Assert.Equal(expected_error, result.Error);
+        Assert.Equal(exceptedDates, result.Value);
+    }
+
+    [Fact]
+    public void GetFreeDatesWithManyAppointment_ShouldOk()
+    {
+        //Arrange
+        string expected_error = string.Empty;
+        string specialization = "gigachad";
+        DateOnly date = new DateOnly(2021, 12, 30);
+        var start = date.ToDateTime(new TimeOnly(0, 0, 0));
+        var end = date.ToDateTime(new TimeOnly(23, 59, 59));
+        var exceptedDates = new List<(DateTime, DateTime)>
+            {
+                (start, start.AddHours(2).AddMinutes(40)),
+                (start.AddHours(4).AddMinutes(5), start.AddHours(8).AddMinutes(12))
+            };
+        _appointmentRepositoryMock.Setup(repository => repository.GetAllDates(specialization, date))
+            .Returns(() => new List<(DateTime, DateTime)>
+            {
+                (start.AddHours(2).AddMinutes(40), start.AddHours(4).AddMinutes(5)),
+                (start.AddHours(8).AddMinutes(12), start.AddHours(23).AddMinutes(59).AddSeconds(59))
+            });
+        
+        //Act
+        var result = _appointmentService.GetFreeDates(specialization, date);
+        
+        //Assert
+        Assert.True(result.Success);
+        Assert.Equal(expected_error, result.Error);
+        Assert.Equal(exceptedDates, result.Value);
     }
 }
