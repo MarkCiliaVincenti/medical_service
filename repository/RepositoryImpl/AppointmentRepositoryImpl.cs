@@ -49,6 +49,6 @@ public class AppointmentRepositoryImpl : IAppointmentRepository
       var dateTime = date.ToDateTime(new TimeOnly(0, 0, 0));
       return _context.Appointments
           .Where(ap => ap.Specialization == specialization && ap.Start.Date == dateTime)
-          .Select(ap => new Tuple<DateTime, DateTime>(ap.Start, ap.End).ToValueTuple()).ToList();
+          .Select(ap => new Tuple<DateTime, DateTime>(ap.Start, ap.End).ToValueTuple()).OrderBy(ap => ap.Item2).ToList();
     }
 }
