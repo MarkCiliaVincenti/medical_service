@@ -9,7 +9,7 @@ public class DoctorService
         _repository = repository;
     }
 
-    public Result<Doctor> CreateDoctor(DoctorForm form)
+    async public Task<Result<Doctor>> CreateDoctor(DoctorForm form)
     {
         if (string.IsNullOrEmpty(form.FullName))
             return Result.Err<Doctor>("Name not specified");
@@ -17,7 +17,7 @@ public class DoctorService
         if (string.IsNullOrEmpty(form.Specialization))
             return Result.Err<Doctor>("Specialization not specified");
 
-        var doctor = _repository.CreateDoctor(form);
+        var doctor = await _repository.CreateDoctor(form);
 
         if (doctor is not null)
             return Result.Ok<Doctor>(doctor);
@@ -25,9 +25,9 @@ public class DoctorService
         return Result.Err<Doctor>("Failed to create doctor");
     }
 
-    public Result DeleteDoctor(int id)
+    async public Task<Result> DeleteDoctor(int id)
     {
-        bool result = _repository.DeleteDoctor(id);
+        bool result = await _repository.DeleteDoctor(id);
 
         if (result == true)
             return Result.Ok();
@@ -35,21 +35,21 @@ public class DoctorService
         return Result.Err("Failed to delete doctor");
     }
 
-    public Result<Doctor> GetDoctorByID(int id)
+    async public Task<Result<Doctor>> GetDoctorByID(int id)
     {
-        var doctor = _repository.GetDoctorByID(id);
+        var doctor = await _repository.GetDoctorByID(id);
 
         if (doctor is not null)
             return Result.Ok<Doctor>(doctor);
 
         return Result.Err<Doctor>("Doctor not found");
     }
-    public Result<List<Doctor>> GetDoctorsBySpecialization(string specialization)
+    async public Task<Result<List<Doctor>>> GetDoctorsBySpecialization(string specialization)
     {
         if (string.IsNullOrEmpty(specialization))
             return Result.Err<List<Doctor>>("Specialization not specified");
 
-        var doctors = _repository.GetDoctorsBySpecialization(specialization);
+        var doctors = await _repository.GetDoctorsBySpecialization(specialization);
 
         if (doctors is not null)
             return Result.Ok<List<Doctor>>(doctors);
@@ -57,9 +57,9 @@ public class DoctorService
         return Result.Err<List<Doctor>>("Doctors not found");
     }
 
-    public Result<List<Doctor>> GetAllDoctors()
+    async public Task<Result<List<Doctor>>> GetAllDoctors()
     {
-        var doctors = _repository.GetAllDoctors();
+        var doctors = await _repository.GetAllDoctors();
 
         if (doctors is not null)
             return Result.Ok<List<Doctor>>(doctors);
