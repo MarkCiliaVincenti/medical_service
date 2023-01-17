@@ -9,9 +9,9 @@ public class ScheduleService
         _repository = repository;
     }
 
-    public Result<Schedule> GetSchedule(int doctorID, DateOnly date)
+    async public Task<Result<Schedule>> GetSchedule(int doctorID, DateOnly date)
     {
-        var schedule = _repository.GetSchedule(doctorID, date);
+        var schedule = await _repository.GetSchedule(doctorID, date);
 
         if (schedule is not null)
             return Result.Ok<Schedule>(schedule);
@@ -19,18 +19,18 @@ public class ScheduleService
         return Result.Err<Schedule>("Schedule not found");
     }
 
-    public Result<Schedule> AddSchedule(ScheduleForm form)
+    async public Task<Result<Schedule>> AddSchedule(ScheduleForm form)
     {
-        var schedule = _repository.AddSchedule(form);
+        var schedule = await _repository.AddSchedule(form);
 
         if (schedule is not null)
             return Result.Ok<Schedule>(schedule);
 
         return Result.Err<Schedule>("Failed to add schedule");
     }
-    public Result<Schedule> ChangeSchedule(ScheduleForm actual, ScheduleForm recent)
+    async public Task<Result<Schedule>> ChangeSchedule(ScheduleForm actual, ScheduleForm recent)
     {
-        var schedule = _repository.ChangeSchedule(actual, recent);
+        var schedule = await _repository.ChangeSchedule(actual, recent);
 
         if (schedule is not null)
             return Result.Ok<Schedule>(schedule);
