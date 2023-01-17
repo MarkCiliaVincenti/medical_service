@@ -21,11 +21,11 @@ public class UserView
 
     public UserView(User user)
     {
-      ID = user.ID;
-      PhoneNumber = user.PhoneNumber;
-      FullName = user.FullName;
-      Role = user.Role;
-      Login = user.Login;
-      Password = user.Password;
+        ID = user.ID;
+        PhoneNumber = user.PhoneNumber;
+        FullName = user.FullName;
+        Role = user.Role;
+        Login = user.Login;
+        Password = user.Password;
     }
 }

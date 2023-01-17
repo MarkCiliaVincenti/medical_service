@@ -7,10 +7,10 @@ namespace Api;
 [Route("[doctorController]")]
 public class DoctorController : ControllerBase
 {
-    private readonly ILogger<UserController> _logger;
+    private readonly ILogger<DoctorController> _logger;
     private readonly DoctorService _service;
 
-    public DoctorController(ILogger<UserController> logger, DoctorService service)
+    public DoctorController(ILogger<DoctorController> logger, DoctorService service)
     {
         _logger = logger;
         _service = service;
@@ -42,7 +42,7 @@ public class DoctorController : ControllerBase
         return Problem(statusCode:(int)StatusCodes.NotFound, detail: result.Error);
     }
 
-    [HttpPost("getDoctorById")]
+    [HttpGet("getDoctorById")]
     public ActionResult<DoctorView> GetDoctorByID(int id)
     {
         var result = _service.GetDoctorByID(id);
@@ -55,7 +55,7 @@ public class DoctorController : ControllerBase
         return Problem(statusCode:(int)StatusCodes.NotFound, detail: result.Error);
     }
 
-    [HttpPost("getDoctorsSpecialization")]
+    [HttpGet("getDoctorsSpecialization")]
     public ActionResult< List<DoctorView> > GetDoctorsBySpecialization(string specialization)
     {
         var result = _service.GetDoctorsBySpecialization(specialization);
@@ -68,7 +68,7 @@ public class DoctorController : ControllerBase
         return Problem(statusCode:(int)StatusCodes.NotFound, detail: result.Error);
     }
 
-    [HttpPost("getDoctorsAll")]
+    [HttpGet("getDoctorsAll")]
     public ActionResult< List<DoctorView> > GetAllDoctors()
     {
         var result = _service.GetAllDoctors();
