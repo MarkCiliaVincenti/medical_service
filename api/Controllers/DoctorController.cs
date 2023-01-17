@@ -4,7 +4,7 @@ using Domain;
 namespace Api;
 
 [ApiController]
-[Route("[doctorController]")]
+[Route("[controller]")]
 public class DoctorController : ControllerBase
 {
     private readonly ILogger<DoctorController> _logger;

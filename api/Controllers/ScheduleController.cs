@@ -4,7 +4,7 @@ using Domain;
 namespace Api;
 
 [ApiController]
-[Route("[scheduleController]")]
+[Route("[controller]")]
 public class ScheduleController : ControllerBase
 {
     private readonly ILogger<ScheduleController> _logger;
@@ -43,7 +43,8 @@ public class ScheduleController : ControllerBase
     }
 
     [HttpPost("changeSchedule")]
-    public ActionResult<ScheduleView> ChangeSchedule(ScheduleForm actual, ScheduleForm recent)
+    public ActionResult<ScheduleView> ChangeSchedule([FromQuery] ScheduleForm actual,
+                                                     [FromQuery] ScheduleForm recent)
     {
       var result = _service.ChangeSchedule(actual, recent);
 
