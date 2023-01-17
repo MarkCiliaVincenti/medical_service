@@ -10,14 +10,16 @@ public class UserRepositoryImpl : IUserRepository
     {
       _context = context;
     }
-    public bool UserExists(string login)
+    async public Task<bool> UserExists(string login)
     {
+        await Task.Delay(0);
         var users = _context.Users.Where(user => user.Login == login).ToList();
 
         return users.Count == 0 ? false : true;
     }
-    public User? GetUserByLogin(string login)
+    async public Task<User?> GetUserByLogin(string login)
     {
+        await Task.Delay(0);
         var user = _context.Users.FirstOrDefault(user => user.Login == login);
 
         if (user is null) return null;
@@ -31,8 +33,9 @@ public class UserRepositoryImpl : IUserRepository
             user.Role
         );
     }
-    public User? CreateUser(UserForm form)
+    async public Task<User?> CreateUser(UserForm form)
     {
+        await Task.Delay(0);
         _context.Users.Add(
             new UserModel
             {
