@@ -29,7 +29,7 @@ public class AppointmentController : ControllerBase
       return Problem(statusCode:(int)StatusCodes.NotFound, detail: result.Error);
     }
 
-    [HttpPost("getFreeDates")]
+    [HttpGet("getFreeDates")]
     public ActionResult<List<(DateTime, DateTime)>> GetFreeDates(string specialization, DateOnly date)
     {
       var result = _service.GetFreeDates(specialization, date);
