@@ -3,6 +3,7 @@ namespace Domain;
 public class AppointmentService
 {
     public readonly IAppointmentRepository _repository;
+    private SemaphoreSlim appointmentSemaphore = new SemaphoreSlim(1, 1);
 
     public AppointmentService(IAppointmentRepository repository)
     {
@@ -22,7 +23,17 @@ public class AppointmentService
         if (await _repository.AppointmentExists(form))
             return Result.Err<Appointment>("Appointment with this doctor for this date already exists");
         
-        var appointment = await _repository.CreateAppointment(form);
+        Appointment? appointment = null;
+        try
+        {
+            await appointmentSemaphore.WaitAsync();
+
+            appointment = await _repository.CreateAppointment(form);
+        }
+        finally
+        {
+            appointmentSemaphore.Release();
+        }
 
         if (appointment is not null)
             return Result.Ok<Appointment>(appointment);
@@ -34,26 +45,40 @@ public class AppointmentService
     {
         if (string.IsNullOrEmpty(specialization))
             return Result.Err<List<(DateTime, DateTime)>>("Specialization not specified");
-
-        var result = _repository.GetAllDates(specialization, date);
-
-        var start = date.ToDateTime(new TimeOnly(0, 0, 0));
-        var end = date.ToDateTime(new TimeOnly(23, 59, 59));
+        
         var freeDates = new List<(DateTime, DateTime)>();
-        var lastDate = (start, start);
-
-        var busyDates = await result;
-        if (busyDates.Count == 0)
-            return Result.Ok(new List<(DateTime, DateTime)>{(start, end)});
-
-        foreach(var currentDate in busyDates)
+        try
         {
-            freeDates.Add((lastDate.Item2, currentDate.Item1));
-            lastDate = currentDate;
-        }
+            await appointmentSemaphore.WaitAsync();
 
-        if (busyDates.Last().Item2 != end)
-            freeDates.Add((busyDates.Last().Item2, end));
+            var result = _repository.GetAllDates(specialization, date);
+
+            var start = date.ToDateTime(new TimeOnly(0, 0, 0));
+            var end = date.ToDateTime(new TimeOnly(23, 59, 59));
+            //var freeDates = new List<(DateTime, DateTime)>();
+            var lastDate = (start, start);
+
+            var busyDates = await result;
+            if (busyDates.Count == 0)
+            {
+                appointmentSemaphore.Release();
+
+                return Result.Ok(new List<(DateTime, DateTime)>{(start, end)});
+            }
+
+            foreach(var currentDate in busyDates)
+            {
+                freeDates.Add((lastDate.Item2, currentDate.Item1));
+                lastDate = currentDate;
+            }
+
+            if (busyDates.Last().Item2 != end)
+                freeDates.Add((busyDates.Last().Item2, end));
+        }
+        finally
+        {
+            appointmentSemaphore.Release();
+        }
 
         return Result.Ok<List<(DateTime, DateTime)>>(freeDates);
     }

@@ -3,6 +3,7 @@ namespace Domain;
 public class DoctorService
 {
     private readonly IDoctorRepository _repository;
+    private SemaphoreSlim doctorSemaphore = new SemaphoreSlim(1, 1);
 
     public DoctorService(IDoctorRepository repository)
     {
@@ -17,7 +18,18 @@ public class DoctorService
         if (string.IsNullOrEmpty(form.Specialization))
             return Result.Err<Doctor>("Specialization not specified");
 
-        var doctor = await _repository.CreateDoctor(form);
+        Doctor? doctor = null;
+
+        try
+        {
+            await doctorSemaphore.WaitAsync();
+
+            doctor = await _repository.CreateDoctor(form);
+        }
+        finally
+        {
+            doctorSemaphore.Release();
+        }
 
         if (doctor is not null)
             return Result.Ok<Doctor>(doctor);
@@ -27,7 +39,17 @@ public class DoctorService
 
     async public Task<Result> DeleteDoctor(int id)
     {
-        bool result = await _repository.DeleteDoctor(id);
+        bool result = false;
+        try
+        {
+            await doctorSemaphore.WaitAsync();
+
+            result = await _repository.DeleteDoctor(id);
+        }
+        finally
+        {
+            doctorSemaphore.Release();
+        }
 
         if (result == true)
             return Result.Ok();
@@ -37,7 +59,17 @@ public class DoctorService
 
     async public Task<Result<Doctor>> GetDoctorByID(int id)
     {
-        var doctor = await _repository.GetDoctorByID(id);
+        Doctor? doctor = null;
+        try
+        {
+            await doctorSemaphore.WaitAsync();
+
+            doctor = await _repository.GetDoctorByID(id);
+        }
+        finally
+        {
+            doctorSemaphore.Release();
+        }
 
         if (doctor is not null)
             return Result.Ok<Doctor>(doctor);
@@ -49,7 +81,17 @@ public class DoctorService
         if (string.IsNullOrEmpty(specialization))
             return Result.Err<List<Doctor>>("Specialization not specified");
 
-        var doctors = await _repository.GetDoctorsBySpecialization(specialization);
+        List<Doctor> doctors = new List<Doctor>();
+        try
+        {
+            await doctorSemaphore.WaitAsync();
+
+            doctors = await _repository.GetDoctorsBySpecialization(specialization);
+        }
+        finally
+        {
+            doctorSemaphore.Release();
+        }
 
         if (doctors is not null)
             return Result.Ok<List<Doctor>>(doctors);
@@ -59,7 +101,17 @@ public class DoctorService
 
     async public Task<Result<List<Doctor>>> GetAllDoctors()
     {
-        var doctors = await _repository.GetAllDoctors();
+        List<Doctor> doctors = new List<Doctor>();
+        try
+        {
+            await doctorSemaphore.WaitAsync();
+
+            doctors = await _repository.GetAllDoctors();
+        }
+        finally
+        {
+            doctorSemaphore.Release();
+        }
 
         if (doctors is not null)
             return Result.Ok<List<Doctor>>(doctors);
