@@ -3,7 +3,7 @@ namespace Domain;
 public class UserService
 {
     private readonly IUserRepository _repository;
-    private SemaphoreSlim userSemaphore = new SemaphoreSlim(1, 1);
+    private static SemaphoreSlim userSemaphore = new SemaphoreSlim(1, 1);
 
     public UserService(IUserRepository repository)
     {
