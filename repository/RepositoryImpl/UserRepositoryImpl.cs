@@ -14,14 +14,12 @@ public class UserRepositoryImpl : IUserRepository
 
     async public Task<bool> UserExists(string login)
     {
-        await Task.Delay(20000);
         var users = await _context.Users.Where(user => user.Login == login).ToListAsync();
 
         return users.Count == 0 ? false : true;
     }
     async public Task<User?> GetUserByLogin(string login)
     {
-        await Task.Delay(5000);
         var user = await _context.Users.FirstOrDefaultAsync(user => user.Login == login);
 
         if (user is null) return null;
@@ -37,7 +35,6 @@ public class UserRepositoryImpl : IUserRepository
     }
     async public Task<User?> CreateUser(UserForm form)
     {
-        await Task.Delay(0);
         await _context.Users.AddAsync(
             new UserModel
             {
