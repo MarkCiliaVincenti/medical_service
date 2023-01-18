@@ -3,7 +3,7 @@ namespace Domain;
 public class ScheduleService
 {
     public readonly IScheduleRepository _repository;
-    private SemaphoreSlim scheduleSemaphore = new SemaphoreSlim(1, 1);
+    private static SemaphoreSlim scheduleSemaphore = new SemaphoreSlim(1, 1);
 
     public ScheduleService(IScheduleRepository repository)
     {
