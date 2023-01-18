@@ -3,7 +3,7 @@ namespace Domain;
 public class DoctorService
 {
     private readonly IDoctorRepository _repository;
-    private SemaphoreSlim doctorSemaphore = new SemaphoreSlim(1, 1);
+    private static SemaphoreSlim doctorSemaphore = new SemaphoreSlim(1, 1);
 
     public DoctorService(IDoctorRepository repository)
     {
