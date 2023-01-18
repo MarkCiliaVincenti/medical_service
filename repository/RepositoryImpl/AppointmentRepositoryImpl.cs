@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Domain;
 
 namespace Repository;
@@ -12,7 +13,6 @@ public class AppointmentRepositoryImpl : IAppointmentRepository
     }
     async public Task<Appointment?> CreateAppointment(AppointmentForm form)
     {
-        await Task.Delay(0);
         var appointment = new AppointmentModel
         {
             Start = form.Start,
@@ -20,11 +20,14 @@ public class AppointmentRepositoryImpl : IAppointmentRepository
             PatientID = form.PatientID,
             DoctorID = form.DoctorID
         };
-        _context.Appointments.Add(appointment);
-        _context.SaveChanges();
+        await _context.Appointments.AddAsync(appointment);
+        await _context.SaveChangesAsync();
 
-        var check = _context.Appointments.FirstOrDefault(ap => ap.DoctorID == form.DoctorID &&
-            ap.PatientID == form.PatientID && ap.Start == form.Start && ap.End == form.End);
+        var check = await _context.Appointments.FirstOrDefaultAsync(
+            ap => ap.DoctorID == form.DoctorID &&
+            ap.PatientID == form.PatientID && ap.Start == form.Start &&
+            ap.End == form.End
+        );
 
         if (check is null) return null;
 
@@ -37,8 +40,7 @@ public class AppointmentRepositoryImpl : IAppointmentRepository
     }
     async public Task<bool> AppointmentExists(AppointmentForm form)
     {
-        await Task.Delay(0);
-        var appointment = _context.Appointments.FirstOrDefault(ap => ap.DoctorID == form.DoctorID &&
+        var appointment = await _context.Appointments.FirstOrDefaultAsync(ap => ap.DoctorID == form.DoctorID &&
             ap.PatientID == form.PatientID && ap.Start == form.Start && ap.End == form.End);
         
         if (appointment is null) return false;
@@ -48,12 +50,11 @@ public class AppointmentRepositoryImpl : IAppointmentRepository
 
     async public Task<List<(DateTime, DateTime)>> GetAllDates(string specialization, DateOnly date)
     {
-        await Task.Delay(0);
         var dateTime = date.ToDateTime(new TimeOnly(0, 0, 0));
-        return _context.Appointments
+        return await _context.Appointments
             .Where(ap => ap.Specialization == specialization && ap.Start.Date == dateTime)
             .Select(ap => new Tuple<DateTime, DateTime>(ap.Start, ap.End).ToValueTuple())
             .OrderBy(ap => ap.Item2)
-            .ToList();
+            .ToListAsync();
     }
 }

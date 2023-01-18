@@ -3,7 +3,7 @@ namespace Domain;
 public class AppointmentService
 {
     public readonly IAppointmentRepository _repository;
-    private SemaphoreSlim appointmentSemaphore = new SemaphoreSlim(1, 1);
+    private static SemaphoreSlim appointmentSemaphore = new SemaphoreSlim(1, 1);
 
     public AppointmentService(IAppointmentRepository repository)
     {
