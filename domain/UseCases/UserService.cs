@@ -3,7 +3,6 @@ namespace Domain;
 public class UserService
 {
     private readonly IUserRepository _repository;
-    private static SemaphoreSlim userSemaphore = new SemaphoreSlim(1, 1);
 
     public UserService(IUserRepository repository)
     {
@@ -15,18 +14,7 @@ public class UserService
         if (string.IsNullOrEmpty(login))
             return Result.Err("Login not specified");
         
-        Boolean exists = false;
-
-        try
-        {
-            await userSemaphore.WaitAsync();
-
-            exists = await _repository.UserExists(login);
-        }
-        finally
-        {
-            userSemaphore.Release();
-        }
+        var exists = await _repository.UserExists(login);
 
         if (exists)
             return Result.Ok();
@@ -39,18 +27,7 @@ public class UserService
         if (string.IsNullOrEmpty(login))
             return Result.Err<User>("Login not specified");
 
-        User? user = null;
-
-        try
-        {
-            await userSemaphore.WaitAsync();
-
-            user = await _repository.GetUserByLogin(login);
-        }
-        finally
-        {
-            userSemaphore.Release();
-        }
+        var user = await _repository.GetUserByLogin(login);
         
         if (user is not null)
             return Result.Ok<User>(user);
@@ -69,18 +46,7 @@ public class UserService
         if (_repository.GetUserByLogin(form.Login) is not null)
             return Result.Err<User>("User with this login already exists");
 
-        User? user = null;
-
-        try
-        {
-            await userSemaphore.WaitAsync();
-
-            user = await _repository.CreateUser(form);
-        }
-        finally
-        {
-            userSemaphore.Release();
-        }
+        var user = await _repository.CreateUser(form);
 
         if (user is not null)
             return Result.Ok<User>(user);
