@@ -3,7 +3,6 @@ namespace Domain;
 public class ScheduleService
 {
     public readonly IScheduleRepository _repository;
-    private static SemaphoreSlim scheduleSemaphore = new SemaphoreSlim(1, 1);
 
     public ScheduleService(IScheduleRepository repository)
     {
@@ -12,17 +11,7 @@ public class ScheduleService
 
     async public Task<Result<Schedule>> GetSchedule(int doctorID, DateOnly date)
     {
-        Schedule? schedule = null;
-        try
-        {
-            await scheduleSemaphore.WaitAsync();
-
-            schedule = await _repository.GetSchedule(doctorID, date);
-        }
-        finally
-        {
-            scheduleSemaphore.Release();
-        }
+        var schedule = await _repository.GetSchedule(doctorID, date);
 
         if (schedule is not null)
             return Result.Ok<Schedule>(schedule);
@@ -32,17 +21,7 @@ public class ScheduleService
 
     async public Task<Result<Schedule>> AddSchedule(ScheduleForm form)
     {
-        Schedule? schedule = null;
-        try
-        {
-            await scheduleSemaphore.WaitAsync();
-
-            schedule = await _repository.AddSchedule(form);
-        }
-        finally
-        {
-            scheduleSemaphore.Release();
-        }
+        var schedule = await _repository.AddSchedule(form);
 
         if (schedule is not null)
             return Result.Ok<Schedule>(schedule);
@@ -51,17 +30,7 @@ public class ScheduleService
     }
     async public Task<Result<Schedule>> ChangeSchedule(ScheduleForm actual, ScheduleForm recent)
     {
-        Schedule? schedule = null;
-        try
-        {
-            await scheduleSemaphore.WaitAsync();
-
-            schedule = await _repository.ChangeSchedule(actual, recent);
-        }
-        finally
-        {
-            scheduleSemaphore.Release();
-        }
+        var schedule = await _repository.ChangeSchedule(actual, recent);
 
         if (schedule is not null)
             return Result.Ok<Schedule>(schedule);
