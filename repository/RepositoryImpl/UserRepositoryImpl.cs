@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Domain;
 
 namespace Repository;
@@ -10,15 +11,16 @@ public class UserRepositoryImpl : IUserRepository
     {
       _context = context;
     }
-    public bool UserExists(string login)
+
+    async public Task<bool> UserExists(string login)
     {
-        var users = _context.Users.Where(user => user.Login == login).ToList();
+        var users = await _context.Users.Where(user => user.Login == login).ToListAsync();
 
         return users.Count == 0 ? false : true;
     }
-    public User? GetUserByLogin(string login)
+    async public Task<User?> GetUserByLogin(string login)
     {
-        var user = _context.Users.FirstOrDefault(user => user.Login == login);
+        var user = await _context.Users.FirstOrDefaultAsync(user => user.Login == login);
 
         if (user is null) return null;
 
@@ -31,9 +33,9 @@ public class UserRepositoryImpl : IUserRepository
             user.Role
         );
     }
-    public User? CreateUser(UserForm form)
+    async public Task<User?> CreateUser(UserForm form)
     {
-        _context.Users.Add(
+        await _context.Users.AddAsync(
             new UserModel
             {
                 PhoneNumber = form.PhoneNumber,
@@ -42,9 +44,9 @@ public class UserRepositoryImpl : IUserRepository
                 Password = form.Password
             }
         );
-        _context.SaveChanges();
+        await _context.SaveChangesAsync();
 
-        var user = _context.Users.FirstOrDefault(user => user.Login == form.Login);
+        var user = await _context.Users.FirstOrDefaultAsync(user => user.Login == form.Login);
 
         if (user is null) return null;
 

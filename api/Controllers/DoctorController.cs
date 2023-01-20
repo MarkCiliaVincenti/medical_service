@@ -17,9 +17,9 @@ public class DoctorController : ControllerBase
     }
 
     [HttpPost("createDoctor")]
-    public ActionResult<DoctorView> CreateDoctor(DoctorForm form)
+    async public Task<ActionResult<DoctorView>> CreateDoctor(DoctorForm form)
     {
-        var result = _service.CreateDoctor(form);
+        var result = await _service.CreateDoctor(form);
 
         if (result.Success)
         {
@@ -30,9 +30,9 @@ public class DoctorController : ControllerBase
     }
 
     [HttpPost("deleteDoctor")]
-    public ActionResult DeleteDoctor(int id)
+    async public Task<ActionResult> DeleteDoctor(int id)
     {
-        var result = _service.DeleteDoctor(id);
+        var result = await _service.DeleteDoctor(id);
 
         if (result.Success)
         {
@@ -43,9 +43,9 @@ public class DoctorController : ControllerBase
     }
 
     [HttpGet("getDoctorById")]
-    public ActionResult<DoctorView> GetDoctorByID(int id)
+    async public Task<ActionResult<DoctorView>> GetDoctorByID(int id)
     {
-        var result = _service.GetDoctorByID(id);
+        var result = await _service.GetDoctorByID(id);
 
         if (result.Success)
         {
@@ -56,9 +56,9 @@ public class DoctorController : ControllerBase
     }
 
     [HttpGet("getDoctorsSpecialization")]
-    public ActionResult< List<DoctorView> > GetDoctorsBySpecialization(string specialization)
+    async public Task<ActionResult<List<DoctorView>>> GetDoctorsBySpecialization(string specialization)
     {
-        var result = _service.GetDoctorsBySpecialization(specialization);
+        var result = await _service.GetDoctorsBySpecialization(specialization);
 
         if (result.Success)
         {
@@ -69,9 +69,9 @@ public class DoctorController : ControllerBase
     }
 
     [HttpGet("getDoctorsAll")]
-    public ActionResult< List<DoctorView> > GetAllDoctors()
+    async public Task<ActionResult<List<DoctorView>>> GetAllDoctors()
     {
-        var result = _service.GetAllDoctors();
+        var result = await _service.GetAllDoctors();
 
         if (result.Success)
         {

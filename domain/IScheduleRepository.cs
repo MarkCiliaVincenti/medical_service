@@ -2,7 +2,7 @@ namespace Domain;
 
 public interface IScheduleRepository
 {
-    Schedule? GetSchedule(int doctorID, DateOnly date);
-    Schedule? AddSchedule(ScheduleForm form);
-    Schedule? ChangeSchedule(ScheduleForm actual, ScheduleForm recent);
+    Task<Schedule?> GetSchedule(int doctorID, DateOnly date);
+    Task<Schedule?> AddSchedule(ScheduleForm form);
+    Task<Schedule?> ChangeSchedule(ScheduleForm actual, ScheduleForm recent);
 }

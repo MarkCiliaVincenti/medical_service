@@ -17,9 +17,9 @@ public class ScheduleController : ControllerBase
     }
 
     [HttpGet("getSchedule")]
-    public ActionResult<ScheduleView> GetSchedule(int doctorID, DateOnly date)
+    async public Task<ActionResult<ScheduleView>> GetSchedule(int doctorID, DateOnly date)
     {
-      var result = _service.GetSchedule(doctorID, date);
+      var result = await _service.GetSchedule(doctorID, date);
 
       if (result.Success)
       {
@@ -30,9 +30,9 @@ public class ScheduleController : ControllerBase
     }
 
     [HttpPost("addSchedule")]
-    public ActionResult<ScheduleView> AddSchedule(ScheduleForm form)
+    async public Task<ActionResult<ScheduleView>> AddSchedule(ScheduleForm form)
     {
-      var result = _service.AddSchedule(form);
+      var result = await _service.AddSchedule(form);
 
       if (result.Success)
       {
@@ -43,10 +43,10 @@ public class ScheduleController : ControllerBase
     }
 
     [HttpPost("changeSchedule")]
-    public ActionResult<ScheduleView> ChangeSchedule([FromQuery] ScheduleForm actual,
+    async public Task<ActionResult<ScheduleView>> ChangeSchedule([FromQuery] ScheduleForm actual,
                                                      [FromQuery] ScheduleForm recent)
     {
-      var result = _service.ChangeSchedule(actual, recent);
+      var result = await _service.ChangeSchedule(actual, recent);
 
       if (result.Success)
       {

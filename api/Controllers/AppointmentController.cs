@@ -17,9 +17,9 @@ public class AppointmentController : ControllerBase
     }
 
     [HttpPost("createAppointment")]
-    public ActionResult<AppointmentView> CreateAppointment(AppointmentForm form)
+    async public Task<ActionResult<AppointmentView>> CreateAppointment(AppointmentForm form)
     {
-      var result = _service.CreateAppointment(form);
+      var result = await _service.CreateAppointment(form);
 
       if (result.Success)
       {
@@ -30,9 +30,9 @@ public class AppointmentController : ControllerBase
     }
 
     [HttpGet("getFreeDates")]
-    public ActionResult<List<(DateTime, DateTime)>> GetFreeDates(string specialization, DateOnly date)
+    async public Task<ActionResult<List<(DateTime, DateTime)>>> GetFreeDates(string specialization, DateOnly date)
     {
-      var result = _service.GetFreeDates(specialization, date);
+      var result = await _service.GetFreeDates(specialization, date);
 
       if (result.Success)
       {

@@ -9,12 +9,12 @@ public class UserService
         _repository = repository;
     }
 
-    public Result UserExists(string login)
-    {     
+    async public Task<Result> UserExists(string login)
+    {
         if (string.IsNullOrEmpty(login))
             return Result.Err("Login not specified");
-
-        bool exists = _repository.UserExists(login);
+        
+        var exists = await _repository.UserExists(login);
 
         if (exists)
             return Result.Ok();
@@ -22,20 +22,20 @@ public class UserService
         return Result.Err("User not found");
     }
 
-    public Result<User> GetUserByLogin(string login)
+    async public Task<Result<User>> GetUserByLogin(string login)
     {
         if (string.IsNullOrEmpty(login))
             return Result.Err<User>("Login not specified");
 
-        User? result = _repository.GetUserByLogin(login);
-
-        if (result is not  null)
-            return Result.Ok<User>(result);
+        var user = await _repository.GetUserByLogin(login);
+        
+        if (user is not null)
+            return Result.Ok<User>(user);
 
         return Result.Err<User>("User not found");
     }
 
-    public Result<User> CreateUser(UserForm form)
+    async public Task<Result<User>> CreateUser(UserForm form)
     {
         if (string.IsNullOrEmpty(form.Login))
             return Result.Err<User>("Login not specified");
@@ -46,7 +46,7 @@ public class UserService
         if (_repository.GetUserByLogin(form.Login) is not null)
             return Result.Err<User>("User with this login already exists");
 
-        var user = _repository.CreateUser(form);
+        var user = await _repository.CreateUser(form);
 
         if (user is not null)
             return Result.Ok<User>(user);
